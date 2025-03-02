@@ -1,5 +1,6 @@
-
+.env
 target/
 dbt_packages/
 logs/
-extract_data.py
+airbnb_data/
+airbnb_data_processed/
