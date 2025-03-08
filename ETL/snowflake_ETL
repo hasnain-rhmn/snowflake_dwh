@@ -1,0 +1,53 @@
+CREATE OR REPLACE STORAGE INTEGRATION s3_int
+  TYPE = EXTERNAL_STAGE
+  STORAGE_PROVIDER = 'S3'
+  ENABLED = TRUE
+  STORAGE_AWS_ROLE_ARN = 'arn:aws:iam::890742587271:role/snowflake-int-role'
+  STORAGE_ALLOWED_LOCATIONS = ('s3://my-airbnb-data-bucket/');
+
+CREATE OR REPLACE FILE FORMAT csv
+  TYPE = 'CSV'
+  FIELD_OPTIONALLY_ENCLOSED_BY = '"'
+  SKIP_HEADER = 1;
+
+CREATE OR REPLACE STAGE s3_stage_listings
+  STORAGE_INTEGRATION = s3_int
+  URL = 's3://my-airbnb-data-bucket/listings/'
+  FILE_FORMAT = csv;
+
+CREATE OR REPLACE STAGE s3_stage_reviews
+  STORAGE_INTEGRATION = s3_int
+  URL = 's3://my-airbnb-data-bucket/reviews/'
+  FILE_FORMAT = csv;
+
+CREATE OR REPLACE STAGE s3_stage_calendar
+  STORAGE_INTEGRATION = s3_int
+  URL = 's3://my-airbnb-data-bucket/calendar/'
+  FILE_FORMAT = csv;
+
+-- Snowpipe for raw_listings
+CREATE OR REPLACE PIPE raw_listings_pipe 
+  AUTO_INGEST = TRUE
+  AS 
+  COPY INTO raw_listings
+  FROM @s3_stage_listings
+  FILE_FORMAT = csv
+  ON_ERROR = 'CONTINUE';
+
+-- Snowpipe for raw_reviews
+CREATE OR REPLACE PIPE raw_reviews_pipe 
+  AUTO_INGEST = TRUE
+  AS 
+  COPY INTO raw_reviews
+  FROM @s3_stage_reviews
+  FILE_FORMAT = csv
+  ON_ERROR = 'CONTINUE';
+
+-- Snowpipe for raw_calendar
+CREATE OR REPLACE PIPE raw_calendar_pipe 
+  AUTO_INGEST = TRUE
+  AS 
+  COPY INTO raw_calendar
+  FROM @s3_stage_calendar
+  FILE_FORMAT = csv
+  ON_ERROR = 'CONTINUE';
