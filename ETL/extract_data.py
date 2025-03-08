@@ -59,8 +59,8 @@ def download_airbnb_data(cities, datasets, output_dir="airbnb_data"):
 
 
 cities = [
-    {"country": "the-netherlands/north-holland/amsterdam", "date": "2024-12-07"},
-    {"country": "united-states/ny/albany", "date": "2025-01-05"} ]
+    {"country": "greece/attica/athens", "date": "2024-12-25"} 
+    ]
 
 
 datasets = ["listings", "calendar", "reviews"]
